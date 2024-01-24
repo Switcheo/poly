@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"fmt"
 
+	tmcrypto "github.com/cometbft/cometbft/proto/tendermint/crypto"
 	"github.com/cosmos/cosmos-sdk/store/rootmulti"
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
@@ -28,7 +29,6 @@ import (
 	scom "github.com/polynetwork/poly/native/service/cross_chain_manager/common"
 	"github.com/polynetwork/poly/native/service/governance/side_chain_manager"
 	"github.com/polynetwork/poly/native/service/header_sync/okex"
-	tmcrypto "github.com/tendermint/tendermint/proto/tendermint/crypto"
 )
 
 type OKHandler struct{}
@@ -65,7 +65,7 @@ func (this *OKHandler) MakeDepositProposal(service *native.NativeService) (*scom
 	}
 	cdc := okex.NewCDC()
 	var myHeader okex.CosmosHeader
-	if err := cdc.UnmarshalBinaryBare(params.HeaderOrCrossChainMsg, &myHeader); err != nil {
+	if err := cdc.Amino.UnmarshalBinaryBare(params.HeaderOrCrossChainMsg, &myHeader); err != nil {
 		return nil, fmt.Errorf("okex MakeDepositProposal, unmarshal okex header failed: %v", err)
 	}
 	if myHeader.Header.Height != int64(params.Height) {
@@ -86,11 +86,11 @@ func (this *OKHandler) MakeDepositProposal(service *native.NativeService) (*scom
 	}
 
 	var proofValue CosmosProofValue
-	if err = cdc.UnmarshalBinaryBare(params.Extra, &proofValue); err != nil {
+	if err = cdc.Amino.UnmarshalBinaryBare(params.Extra, &proofValue); err != nil {
 		return nil, fmt.Errorf("okex MakeDepositProposal, unmarshal proof value err: %v", err)
 	}
 	var proof tmcrypto.ProofOps
-	err = cdc.UnmarshalBinaryBare(params.Proof, &proof)
+	err = cdc.Amino.UnmarshalBinaryBare(params.Proof, &proof)
 	if err != nil {
 		return nil, fmt.Errorf("okex MakeDepositProposal, unmarshal proof err: %v", err)
 	}
