@@ -20,8 +20,8 @@ import (
 	"bytes"
 	"fmt"
 
+	"cosmossdk.io/store/rootmulti"
 	tmcrypto "github.com/cometbft/cometbft/proto/tendermint/crypto"
-	"github.com/cosmos/cosmos-sdk/store/rootmulti"
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/polynetwork/poly/common"
