@@ -29,7 +29,6 @@ require (
 	github.com/polynetwork/poly-io-test v0.0.0-20200819093740-8cf514b07750
 	github.com/stretchr/testify v1.9.0
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d
-	github.com/tendermint/tendermint v0.34.9
 	github.com/urfave/cli v1.22.4
 	github.com/valyala/bytebufferpool v1.0.0
 	golang.org/x/crypto v0.19.0

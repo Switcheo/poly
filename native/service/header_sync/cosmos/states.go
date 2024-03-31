@@ -2,9 +2,10 @@ package cosmos
 
 import (
 	"fmt"
+
+	"github.com/cometbft/cometbft/libs/bytes"
+	cmttypes "github.com/cometbft/cometbft/types"
 	"github.com/polynetwork/poly/common"
-	"github.com/tendermint/tendermint/libs/bytes"
-	"github.com/tendermint/tendermint/types"
 )
 
 type CosmosEpochSwitchInfo struct {
@@ -54,7 +55,7 @@ func (info *CosmosEpochSwitchInfo) Deserialization(source *common.ZeroCopySource
 }
 
 type CosmosHeader struct {
-	Header  types.Header
-	Commit  *types.Commit
-	Valsets []*types.Validator
+	Header  cmttypes.Header
+	Commit  *cmttypes.Commit
+	Valsets []*cmttypes.Validator
 }
