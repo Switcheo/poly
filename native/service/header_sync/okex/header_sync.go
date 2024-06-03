@@ -22,8 +22,9 @@ import (
 
 	"bytes"
 
-	tbytes "github.com/tendermint/tendermint/libs/bytes"
+	tbytes "github.com/cometbft/cometbft/libs/bytes"
 
+	"github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/polynetwork/poly/common"
 	"github.com/polynetwork/poly/common/config"
@@ -35,7 +36,6 @@ import (
 	hscommon "github.com/polynetwork/poly/native/service/header_sync/common"
 	"github.com/polynetwork/poly/native/service/header_sync/okex/ethsecp256k1"
 	"github.com/polynetwork/poly/native/service/utils"
-	"github.com/tendermint/tendermint/types"
 )
 
 // Handler ...
@@ -237,9 +237,9 @@ func VerifyCosmosHeader(myHeader *CosmosHeader, info *CosmosEpochSwitchInfo) err
 		return fmt.Errorf("VerifyCosmosHeader, block validator is not right!, header validator hash: %s, "+
 			"validator set hash: %s", myHeader.Header.ValidatorsHash.String(), hex.EncodeToString(valset.Hash()))
 	}
-	if myHeader.Commit.GetHeight() != myHeader.Header.Height {
+	if myHeader.Commit.Height != myHeader.Header.Height {
 		return fmt.Errorf("VerifyCosmosHeader, commit height is not right! commit height: %d, "+
-			"header height: %d", myHeader.Commit.GetHeight(), myHeader.Header.Height)
+			"header height: %d", myHeader.Commit.Height, myHeader.Header.Height)
 	}
 	if !bytes.Equal(myHeader.Commit.BlockID.Hash, myHeader.Header.Hash()) {
 		return fmt.Errorf("VerifyCosmosHeader, commit hash is not right!, commit block hash: %s,"+
@@ -253,7 +253,7 @@ func VerifyCosmosHeader(myHeader *CosmosHeader, info *CosmosEpochSwitchInfo) err
 	}
 	talliedVotingPower := int64(0)
 	for idx, commitSig := range myHeader.Commit.Signatures {
-		if commitSig.Absent() {
+		if commitSig.BlockIDFlag == types.BlockIDFlagAbsent {
 			continue // OK, some precommits can be missing.
 		}
 		_, val := valset.GetByIndex(int32(idx))

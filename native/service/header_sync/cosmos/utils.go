@@ -22,6 +22,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/cometbft/cometbft/types"
 	"github.com/polynetwork/poly/common"
 	"github.com/polynetwork/poly/common/config"
 	cstates "github.com/polynetwork/poly/core/states"
@@ -29,7 +30,6 @@ import (
 	"github.com/polynetwork/poly/native/event"
 	hscommon "github.com/polynetwork/poly/native/service/header_sync/common"
 	"github.com/polynetwork/poly/native/service/utils"
-	"github.com/tendermint/tendermint/types"
 )
 
 func notifyEpochSwitchInfo(native *native.NativeService, chainID uint64, info *CosmosEpochSwitchInfo) {
@@ -81,13 +81,13 @@ func VerifyCosmosHeader(myHeader *CosmosHeader, info *CosmosEpochSwitchInfo) err
 		return fmt.Errorf("VerifyCosmosHeader, block validator is not right!, header validator hash: %s, "+
 			"validator set hash: %s", myHeader.Header.ValidatorsHash.String(), hex.EncodeToString(valset.Hash()))
 	}
-	if myHeader.Commit.GetHeight() != myHeader.Header.Height {
+	if myHeader.Commit.Height != myHeader.Header.Height {
 		return fmt.Errorf("VerifyCosmosHeader, commit height is not right! commit height: %d, "+
-			"header height: %d", myHeader.Commit.GetHeight(), myHeader.Header.Height)
+			"header height: %d", myHeader.Commit.Height, myHeader.Header.Height)
 	}
 	if !bytes.Equal(myHeader.Commit.BlockID.Hash, myHeader.Header.Hash()) {
 		return fmt.Errorf("VerifyCosmosHeader, commit hash is not right!, commit block hash: %s,"+
-			" header hash: %s", myHeader.Commit.BlockID.Hash.String(), hex.EncodeToString(valset.Hash()))
+			" header hash: %s", hex.EncodeToString(myHeader.Commit.BlockID.Hash), hex.EncodeToString(valset.Hash()))
 	}
 	if err := myHeader.Commit.ValidateBasic(); err != nil {
 		return fmt.Errorf("VerifyCosmosHeader, commit is not right! err: %s", err.Error())
@@ -97,7 +97,7 @@ func VerifyCosmosHeader(myHeader *CosmosHeader, info *CosmosEpochSwitchInfo) err
 	}
 	talliedVotingPower := int64(0)
 	for idx, commitSig := range myHeader.Commit.Signatures {
-		if commitSig.Absent() {
+		if commitSig.BlockIDFlag == types.BlockIDFlagAbsent {
 			continue // OK, some precommits can be missing.
 		}
 		_, val := valset.GetByIndex(int32(idx))
